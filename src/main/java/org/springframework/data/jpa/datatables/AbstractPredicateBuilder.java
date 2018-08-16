@@ -52,14 +52,19 @@ abstract class AbstractPredicateBuilder<T> {
      */
     public Pageable createPageable() {
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
-        for (org.springframework.data.jpa.datatables.mapping.Order order : input.getOrder()) {
-            Column column = input.getColumns().get(order.getColumn());
-            if (column.getOrderable()) {
-                String sortColumn = column.getData();
-                Sort.Direction sortDirection = Sort.Direction.fromString(order.getDir());
-                orders.add(new Sort.Order(sortDirection, sortColumn));
-            }
-        }
+    		if (input.getOrderClauses() == null) {
+    	        for (org.springframework.data.jpa.datatables.mapping.Order order : input.getOrder()) {
+    	            Column column = input.getColumns().get(order.getColumn());
+    	            if (column.getOrderable()) {
+    	                String sortColumn = column.getData();
+    	                Sort.Direction sortDirection = Sort.Direction.fromString(order.getDir());
+    	                orders.add(new Sort.Order(sortDirection, sortColumn));
+    	            }
+    	        }
+    		}
+    		else {
+    			orders = input.getOrderClauses();
+    		}
         Sort sort = orders.isEmpty() ? null : new Sort(orders);
 
         if (input.getLength() == -1) {

@@ -9,6 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.domain.Sort;
 
 import lombok.Data;
 
@@ -54,6 +55,11 @@ public class DataTablesInput {
    */
   @NotEmpty
   private List<Order> order = new ArrayList<Order>();
+
+  /**
+   * Order parameter
+   */
+  private List<Sort.Order> orderClauses = new ArrayList<Sort.Order>();
 
   /**
    * Per-column search parameter
