@@ -5,7 +5,7 @@
 
 	<groupId>com.github.darrachequesne</groupId>
 	<artifactId>spring-data-jpa-datatables</artifactId>
-	<version>4.3-custom</version>
+	<version>4.3-custom-1</version>
 
 	<name>Spring Data JPA for DataTables</name>
 	<description>Spring Data JPA extension to work with the great jQuery plug-in DataTables (http://datatables.net/)</description>
@@ -76,6 +76,12 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-lang</groupId>
+		    <artifactId>commons-lang</artifactId>
+		    <version>2.6</version>
 		</dependency>
 
 		<dependency>

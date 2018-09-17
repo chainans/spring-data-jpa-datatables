@@ -1,10 +1,12 @@
 package org.springframework.data.jpa.datatables.qrepository;
 
 import java.io.Serializable;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.datatables.PredicateBuilder;
@@ -93,6 +95,7 @@ public class QDataTablesRepositoryImpl<T, ID extends Serializable>
       output.setRecordsFiltered(data.getTotalElements());
 
     } catch (Exception e) {
+    	System.out.println(ExceptionUtils.getStackTrace(e));
       output.setError(e.toString());
     }
 
