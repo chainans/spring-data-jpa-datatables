@@ -66,6 +66,8 @@ public class DataTablesInput {
    */
   @NotEmpty
   private List<Column> columns = new ArrayList<Column>();
+  
+  List<String> customParams = new ArrayList<String>();
 
   /**
    * 
