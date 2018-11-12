@@ -1,7 +1,6 @@
 package org.springframework.data.jpa.datatables.qrepository;
 
 import java.io.Serializable;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -9,6 +8,7 @@ import javax.persistence.EntityManager;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.datatables.PredicateBuilder;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
@@ -16,11 +16,14 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
 import org.springframework.data.querydsl.EntityPathResolver;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
+import org.springframework.data.repository.support.PageableExecutionUtils;
+import org.springframework.data.repository.support.PageableExecutionUtils.TotalSupplier;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.JPQLQuery;
 
 public class QDataTablesRepositoryImpl<T, ID extends Serializable>
     extends QueryDslJpaRepository<T, ID> implements QDataTablesRepository<T, ID> {
@@ -101,4 +104,49 @@ public class QDataTablesRepositoryImpl<T, ID extends Serializable>
 
     return output;
   }
+  
+
+	@Override
+	public <R> DataTablesOutput<R> findAll(DataTablesInput input, List<T> filteredContent, Predicate additionalPredicate,
+			Predicate preFilteringPredicate, Converter<T, R> converter) {
+	    DataTablesOutput<R> output = new DataTablesOutput<R>();
+	    output.setDraw(input.getDraw());
+	    if (input.getLength() == 0) {
+	      return output;
+	    }
+
+	    try {
+	      long recordsTotal = preFilteringPredicate == null ? count() : count(preFilteringPredicate);
+	      if (recordsTotal == 0) {
+	        return output;
+	      }
+	      output.setRecordsTotal(recordsTotal);
+
+	      PredicateBuilder predicateBuilder = new PredicateBuilder(this.builder, input);
+	      Predicate predicate = new BooleanBuilder()
+                  .and(predicateBuilder.build())
+                  .and(additionalPredicate)
+                  .and(preFilteringPredicate).getValue();
+	      Pageable pageable = predicateBuilder.createPageable();
+	      final JPQLQuery<?> countQuery = createCountQuery(predicate);
+	      Page<T> data = PageableExecutionUtils.getPage(filteredContent, pageable, new TotalSupplier() {
+				@Override
+				public long get() {
+					return countQuery.fetchCount();
+				}
+			});
+
+	      @SuppressWarnings("unchecked")
+	      List<R> content =
+	          converter == null ? (List<R>) data.getContent() : data.map(converter).getContent();
+	      output.setData(content);
+	      output.setRecordsFiltered(data.getTotalElements());
+
+	    } catch (Exception e) {
+	    	System.out.println(ExceptionUtils.getStackTrace(e));
+	      output.setError(e.toString());
+	    }
+
+	    return output;
+	}
 }

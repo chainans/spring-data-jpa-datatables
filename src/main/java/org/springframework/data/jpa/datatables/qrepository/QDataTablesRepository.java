@@ -1,6 +1,7 @@
 package org.springframework.data.jpa.datatables.qrepository;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
@@ -73,6 +74,13 @@ public interface QDataTablesRepository<T, ID extends Serializable>
    * @return a {@link DataTablesOutput}
    */
   <R> DataTablesOutput<R> findAll(DataTablesInput input, Predicate additionalPredicate,
+      Predicate preFilteringPredicate, Converter<T, R> converter);
+
+
+  /**
+   * Manual adding content
+   */
+  <R> DataTablesOutput<R> findAll(DataTablesInput input, List<T> filteredContent, Predicate additionalPredicate,
       Predicate preFilteringPredicate, Converter<T, R> converter);
 
 }
